@@ -63,6 +63,7 @@ var TransformControls = function ( camera, domElement ) {
 	defineProperty( 'showZ', true );
 
 	var changeEvent = { type: 'change' };
+	var transformEvent = { type: 'transform' };
 	var mouseDownEvent = { type: 'mouseDown' };
 	var mouseUpEvent = { type: 'mouseUp', mode: scope.mode };
 	var objectChangeEvent = { type: 'objectChange' };
@@ -453,7 +454,7 @@ var TransformControls = function ( camera, domElement ) {
 				}
 
 			}
-
+			
 		} else if ( mode === 'scale' ) {
 
 			if ( axis.search( 'XYZ' ) !== - 1 ) {
@@ -580,6 +581,7 @@ var TransformControls = function ( camera, domElement ) {
 		}
 
 		this.dispatchEvent( changeEvent );
+		this.dispatchEvent( transformEvent );
 		this.dispatchEvent( objectChangeEvent );
 
 	};
@@ -1420,7 +1422,7 @@ var TransformControlsGizmo = function () {
 
 							handle.visible = false;
 
-						} else {
+						} else  {
 
 							handle.scale.x *= - 1;
 
