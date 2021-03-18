@@ -52,6 +52,7 @@ var TransformControls = function ( camera, domElement ) {
 	defineProperty( 'enabled', true );
 	defineProperty( 'axis', null );
 	defineProperty( 'mode', 'translate' );
+	defineProperty( 'offsetSnap', null );
 	defineProperty( 'translationSnap', null );
 	defineProperty( 'rotationSnap', null );
 	defineProperty( 'scaleSnap', null );
@@ -92,6 +93,7 @@ var TransformControls = function ( camera, domElement ) {
 
 	var _tempVector = new Vector3();
 	var _tempVector2 = new Vector3();
+	var _tempVector3 = new Vector3();
 	var _tempQuaternion = new Quaternion();
 	var _unit = {
 		X: new Vector3( 1, 0, 0 ),
@@ -304,13 +306,13 @@ var TransformControls = function ( camera, domElement ) {
 				}
 
 				if ( space === 'local' && this.mode === 'rotate' ) {
-
+/*
 					var snap = this.rotationSnap;
 
 					if ( this.axis === 'X' && snap ) this.object.rotation.x = Math.round( this.object.rotation.x / snap ) * snap;
 					if ( this.axis === 'Y' && snap ) this.object.rotation.y = Math.round( this.object.rotation.y / snap ) * snap;
 					if ( this.axis === 'Z' && snap ) this.object.rotation.z = Math.round( this.object.rotation.z / snap ) * snap;
-
+*/
 				}
 
 				this.object.updateMatrixWorld();
@@ -367,6 +369,32 @@ var TransformControls = function ( camera, domElement ) {
 
 			offset.copy( pointEnd ).sub( pointStart );
 
+			if ( this.offsetSnap ) {
+				
+				_tempVector3.set( 0,0,0 );
+				
+				for( var i=0; i<3; i++ ){
+					//project offset onto the x,y,z axis and apply snapping to the length of projected vector
+					if(i==0) 		_tempVector.copy( _unit[ 'X' ] ).applyQuaternion( object.quaternion );
+					else if(i==1)	_tempVector.copy( _unit[ 'Y' ] ).applyQuaternion( object.quaternion );
+					else if(i==2)	_tempVector.copy( _unit[ 'Z' ] ).applyQuaternion( object.quaternion );
+
+					_tempVector2.copy( offset ).projectOnVector( _tempVector );
+					var projectedLength = _tempVector2.length();
+					
+					if(this.offsetSnap<1){
+						var m = 1/this.offsetSnap;
+						projectedLength = Math.round(projectedLength*m)/m;
+					}else projectedLength = Math.round(projectedLength);
+					
+					_tempVector2.normalize().multiplyScalar( projectedLength );
+					_tempVector3.add( _tempVector2 );				
+				}
+				
+				offset.copy( _tempVector3 );
+				
+			}
+			
 			if ( space === 'local' && axis !== 'XYZ' ) {
 
 				offset.applyQuaternion( worldQuaternionInv );
@@ -459,7 +487,24 @@ var TransformControls = function ( camera, domElement ) {
 
 			if ( axis.search( 'XYZ' ) !== - 1 ) {
 
-				var d = pointEnd.length() / pointStart.length();
+				let startLength = pointStart.length();
+				let endLength = pointEnd.length();
+				
+				if ( this.offsetSnap ) {
+					
+					if(this.offsetSnap<1){
+						var m = 1/this.offsetSnap;
+						startLength = Math.round(startLength*m)/m;
+					}else startLength = Math.round(startLength);
+					
+					if(this.offsetSnap<1){
+						var m = 1/this.offsetSnap;
+						endLength = Math.round(endLength*m)/m;
+					}else endLength = Math.round(endLength);
+					
+				}
+				
+				var d = endLength / startLength;
 
 				if ( pointEnd.dot( pointStart ) < 0 ) d *= - 1;
 
@@ -470,6 +515,24 @@ var TransformControls = function ( camera, domElement ) {
 				_tempVector.copy( pointStart );
 				_tempVector2.copy( pointEnd );
 
+				if ( this.offsetSnap ) {
+					
+					if(this.offsetSnap<1){
+						var m = 1/this.offsetSnap;
+						_tempVector.multiplyScalar(m);
+						_tempVector.round();
+						_tempVector.divideScalar(m);
+					}else _tempVector.round();	
+					
+					if(this.offsetSnap<1){
+						var m = 1/this.offsetSnap;
+						_tempVector2.multiplyScalar(m);
+						_tempVector2.round();
+						_tempVector2.divideScalar(m);
+					}else _tempVector2.round();	
+					
+				}
+				
 				_tempVector.applyQuaternion( worldQuaternionInv );
 				_tempVector2.applyQuaternion( worldQuaternionInv );
 
@@ -692,6 +755,12 @@ var TransformControls = function ( camera, domElement ) {
 
 	};
 
+	this.setOffsetSnap = function ( offsetSnap ) {
+
+		scope.offsetSnap = offsetSnap;
+
+	};
+	
 	this.setTranslationSnap = function ( translationSnap ) {
 
 		scope.translationSnap = translationSnap;
