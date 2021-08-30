@@ -290,6 +290,8 @@ class TransformControls extends Object3D {
 
 	pointerMove( pointer ) {
 
+		if( !gizmo.safe ) return;
+		
 		const axis = this.axis;
 		const mode = this.mode;
 		const object = this.object;
