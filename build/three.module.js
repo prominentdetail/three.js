@@ -8973,6 +8973,8 @@ class MeshBasicMaterial extends Material {
 		super();
 
 		this.type = 'MeshBasicMaterial';
+		
+		this.defines = {};
 
 		this.color = new Color( 0xffffff ); // emissive
 
@@ -35882,6 +35884,8 @@ class MeshPhongMaterial extends Material {
 		super();
 
 		this.type = 'MeshPhongMaterial';
+		
+		this.defines = {};
 
 		this.color = new Color( 0xffffff ); // diffuse
 		this.specular = new Color( 0x111111 );
@@ -36232,7 +36236,9 @@ class MeshLambertMaterial extends Material {
 		super();
 
 		this.type = 'MeshLambertMaterial';
-
+		
+		this.defines = {};
+		
 		this.color = new Color( 0xffffff ); // diffuse
 
 		this.map = null;
