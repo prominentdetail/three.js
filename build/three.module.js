@@ -10785,7 +10785,7 @@ class Mesh extends Object3D {
 		_sphere$3.copy( geometry.boundingSphere );
 		_sphere$3.applyMatrix4( matrixWorld );
 
-		if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) return;
+		if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false && !this.isSkinnedMesh ) return;
 
 		//
 
@@ -10796,7 +10796,7 @@ class Mesh extends Object3D {
 
 		if ( geometry.boundingBox !== null ) {
 
-			if ( _ray$2.intersectsBox( geometry.boundingBox ) === false ) return;
+			if ( _ray$2.intersectsBox( geometry.boundingBox ) === false && !this.isSkinnedMesh ) return;
 
 		}
 
